@@ -2,9 +2,16 @@ package everycoding.nalseebackend.post;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
+import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
+import everycoding.nalseebackend.firebase.FcmService;
+import everycoding.nalseebackend.firebase.dto.FcmSendDto;
 import everycoding.nalseebackend.post.dto.*;
+import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.UserService;
+import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -22,6 +30,9 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
+    private final FcmService fcmService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     // 기본 조회
     @GetMapping("/api/posts")
@@ -100,7 +111,32 @@ public class PostController {
 
     // 게시물 좋아요
     @PostMapping("/api/posts/{postId}/likes")
-    public ApiResponse<Void> likePost(@AuthenticationPrincipal CustomUserDetails customUserDetails,@PathVariable Long postId) {
+    public ApiResponse<Void> likePost(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long postId, HttpServletRequest request) throws IOException {
+        String token = "";
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("AccessToken")) {
+                token = cookie.getValue();
+                log.info("token={}", token);
+            }
+        }
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String userEmail = claims.getSubject();
+        Optional<User> byEmail = userRepository.findByEmail(userEmail);
+        User user = byEmail.orElseThrow();
+        String username = user.getUsername();
+
+        String userToken = userService.findUserTokenByPostId(postId);
+        if(!userToken.equals("error")) {
+            //  FCM 메시지 생성 및 전송
+            FcmSendDto fcmSendDto = FcmSendDto.builder()
+                    .token(userToken)
+                    .title("좋아요 알림")
+                    .body(username +"님이 좋아요를 눌렀습니다.")
+                    .build();
+
+            fcmService.sendMessageTo(fcmSendDto);
+        }
         postService.likePost(customUserDetails.getId(), postId);
         return ApiResponse.ok();
     }

@@ -2,25 +2,65 @@ package everycoding.nalseebackend.user;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
+import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
+import everycoding.nalseebackend.firebase.FcmService;
+import everycoding.nalseebackend.firebase.dto.FcmSendDto;
+import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
 import everycoding.nalseebackend.user.dto.UserInfoRequestDto;
 import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private final FcmService fcmService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     // 팔로우
     @PostMapping("/api/users/{userId}/follow")
     public ApiResponse<Void> followUser(
             @PathVariable Long userId,
-            @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            HttpServletRequest request
+    ) throws IOException {
+        String token = "";
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("AccessToken")) {
+                token = cookie.getValue();
+            }
+        }
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String userEmail = claims.getSubject();
+        Optional<User> byEmail = userRepository.findByEmail(userEmail);
+        User user = byEmail.orElseThrow();
+        String username = user.getUsername();
+
+        Optional<User> byId = userRepository.findById(userId);
+        User owner = byId.orElseThrow();
+        String userToken = owner.getFcmToken();
+        if(!userToken.equals("error")) {
+            //  FCM 메시지 생성 및 전송
+            FcmSendDto fcmSendDto = FcmSendDto.builder()
+                    .token(userToken)
+                    .title("팔로우 알림")
+                    .body(username +"님이 팔로우를 시작했습니다.")
+                    .build();
+
+            fcmService.sendMessageTo(fcmSendDto);
+        }
         userService.followUser(userId, customUserDetails.getId());
         return ApiResponse.ok();
     }

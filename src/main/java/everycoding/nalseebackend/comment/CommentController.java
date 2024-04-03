@@ -2,18 +2,25 @@ package everycoding.nalseebackend.comment;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
+import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.comment.dto.CommentRequestDto;
 import everycoding.nalseebackend.comment.dto.CommentResponseDto;
 import everycoding.nalseebackend.firebase.FcmService;
 import everycoding.nalseebackend.firebase.FcmServiceImpl;
 import everycoding.nalseebackend.firebase.dto.FcmSendDto;
+import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.UserService;
+import everycoding.nalseebackend.user.domain.User;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,6 +29,8 @@ public class CommentController {
     private final CommentService commentService;
     private final FcmService fcmService;
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
     // 댓글 조회
     @GetMapping("/api/posts/{postId}/comments")
@@ -33,15 +42,29 @@ public class CommentController {
     @PostMapping("/api/posts/{postId}/comments")
     public ApiResponse<Void> writeComment(
             @PathVariable Long postId,
-            @RequestBody CommentRequestDto requestDto
+            @RequestBody CommentRequestDto requestDto,
+            HttpServletRequest request
     ) throws IOException {
+        String token = "";
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("AccessToken")) {
+                token = cookie.getValue();
+            }
+        }
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String userEmail = claims.getSubject();
+        Optional<User> byEmail = userRepository.findByEmail(userEmail);
+        User user = byEmail.orElseThrow();
+        String username = user.getUsername();
+
         String userToken = userService.findUserTokenByPostId(postId);
         if(!userToken.equals("error")) {
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
                     .title("새로운 댓글 알림")
-                    .body("당신의 게시글에 새로운 댓글이 달렸습니다.")
+                    .body(username + "님께서 댓글을 작성했습니다.")
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
