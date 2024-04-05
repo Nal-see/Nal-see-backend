@@ -55,16 +55,18 @@ public class UserController {
         User owner = byId.orElseThrow();
         String userToken = owner.getFcmToken();
         String message = username +"님이 팔로우를 시작했습니다.";
-        if(!userToken.equals("error")) {
-            //  FCM 메시지 생성 및 전송
-            FcmSendDto fcmSendDto = FcmSendDto.builder()
-                    .token(userToken)
-                    .title("팔로우 알림")
-                    .body(message)
-                    .userId(user.getId())
-                    .build();
+        if (userToken != null && !userToken.isEmpty()) {
+            if (!userToken.equals("error")) {
+                //  FCM 메시지 생성 및 전송
+                FcmSendDto fcmSendDto = FcmSendDto.builder()
+                        .token(userToken)
+                        .title("팔로우 알림")
+                        .body(message)
+                        .userId(user.getId())
+                        .build();
 
-            fcmService.sendMessageTo(fcmSendDto);
+                fcmService.sendMessageTo(fcmSendDto);
+            }
         }
         Alarm alarm = Alarm.builder()
                 .senderId(user.getId())

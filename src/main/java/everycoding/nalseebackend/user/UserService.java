@@ -120,7 +120,7 @@ public class UserService {
         Post post = byId.orElseThrow();
         User user = post.getUser();
         String fcmToken = user.getFcmToken();
-        if (fcmToken.isEmpty()) {
+        if (fcmToken == null || fcmToken.isEmpty()) {
             return "error";
         }
         return fcmToken;
@@ -138,7 +138,7 @@ public class UserService {
         Comment comment = byId.orElseThrow();
         User user = comment.getUser();
         String fcmToken = user.getFcmToken();
-        if (fcmToken.isEmpty()) {
+        if (fcmToken == null ||fcmToken.isEmpty()) {
             return "error";
         }
         return fcmToken;

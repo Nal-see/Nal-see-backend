@@ -63,16 +63,18 @@ public class CommentController {
          String userToken = userService.findUserTokenByPostId(postId);
          User userByPostId = userService.findUserByPostId(postId);
          String message = username + "님께서 댓글을 작성했습니다.";
-         if(!userToken.equals("error")) {
-             //  FCM 메시지 생성 및 전송
-             FcmSendDto fcmSendDto = FcmSendDto.builder()
-                     .token(userToken)
-                     .title("새로운 댓글 알림")
-                     .body(message)
-                     .postId(postId)
-                     .build();
+         if (userToken != null && !userToken.isEmpty()) {
+             if(!userToken.equals("error")) {
+                 //  FCM 메시지 생성 및 전송
+                 FcmSendDto fcmSendDto = FcmSendDto.builder()
+                         .token(userToken)
+                         .title("새로운 댓글 알림")
+                         .body(message)
+                         .postId(postId)
+                         .build();
 
-             fcmService.sendMessageTo(fcmSendDto);
+                 fcmService.sendMessageTo(fcmSendDto);
+             }
          }
 
          Alarm alarm = Alarm.builder()
