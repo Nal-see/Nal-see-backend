@@ -54,8 +54,8 @@ public class UserController {
         Optional<User> byId = userRepository.findById(userId);
         User owner = byId.orElseThrow();
         String userToken = owner.getFcmToken();
+        String message = username +"님이 팔로우를 시작했습니다.";
         if(userToken != null && !userToken.equals("error")) {
-            String message = username +"님이 팔로우를 시작했습니다.";
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
@@ -65,17 +65,17 @@ public class UserController {
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
-
-            Alarm alarm = Alarm.builder()
-                    .senderId(user.getId())
-                    .senderImg(user.getPicture())
-                    .senderName(username)
-                    .user(owner)
-                    .message(message)
-                    .build();
-
-            alarmRepository.save(alarm);
         }
+        Alarm alarm = Alarm.builder()
+                .senderId(user.getId())
+                .senderImg(user.getPicture())
+                .senderName(username)
+                .user(owner)
+                .message(message)
+                .build();
+
+        alarmRepository.save(alarm);
+
         userService.followUser(userId, customUserDetails.getId());
         return ApiResponse.ok();
     }

@@ -62,8 +62,8 @@ public class CommentController {
 
          String userToken = userService.findUserTokenByPostId(postId);
          User userByPostId = userService.findUserByPostId(postId);
+         String message = username + "님께서 댓글을 작성했습니다.";
          if(userToken != null && !userToken.equals("error")) {
-             String message = username + "님께서 댓글을 작성했습니다.";
              //  FCM 메시지 생성 및 전송
              FcmSendDto fcmSendDto = FcmSendDto.builder()
                      .token(userToken)
@@ -73,17 +73,18 @@ public class CommentController {
                      .build();
 
              fcmService.sendMessageTo(fcmSendDto);
-
-             Alarm alarm = Alarm.builder()
-                     .senderId(user.getId())
-                     .senderImg(user.getPicture())
-                     .senderName(username)
-                     .user(userByPostId)
-                     .message(message)
-                     .build();
-
-             alarmRepository.save(alarm);
          }
+
+         Alarm alarm = Alarm.builder()
+                 .senderId(user.getId())
+                 .senderImg(user.getPicture())
+                 .senderName(username)
+                 .user(userByPostId)
+                 .message(message)
+                 .build();
+
+         alarmRepository.save(alarm);
+
 
         commentService.writeComment(postId, requestDto);
         return ApiResponse.ok();
@@ -135,9 +136,9 @@ public class CommentController {
 
         String userToken = userService.findUserTokenByCommentId(commentId);
         User userByCommentId = userService.findUserByCommentId(commentId);
-
+        String message = username + "님이 댓글에 좋아요를 눌렀습니다.";
         if(userToken != null && !userToken.equals("error")) {
-            String message = username +"님이 댓글에 좋아요를 눌렀습니다.";
+
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
@@ -147,17 +148,16 @@ public class CommentController {
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
-
-            Alarm alarm = Alarm.builder()
-                    .senderId(user.getId())
-                    .senderImg(user.getPicture())
-                    .senderName(username)
-                    .user(userByCommentId)
-                    .message(message)
-                    .build();
-
-            alarmRepository.save(alarm);
         }
+        Alarm alarm = Alarm.builder()
+                .senderId(user.getId())
+                .senderImg(user.getPicture())
+                .senderName(username)
+                .user(userByCommentId)
+                .message(message)
+                .build();
+
+        alarmRepository.save(alarm);
         commentService.likeComment(customUserDetails.getId(), postId, commentId);
         return ApiResponse.ok();
     }

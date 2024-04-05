@@ -131,8 +131,9 @@ public class PostController {
 
         String userToken = userService.findUserTokenByPostId(postId);
         User userByPostId = userService.findUserByPostId(postId);
+        String message = username +"님이 좋아요를 눌렀습니다.";
         if(userToken != null && !userToken.equals("error")) {
-            String message = username +"님이 좋아요를 눌렀습니다.";
+
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
@@ -142,17 +143,17 @@ public class PostController {
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
-
-            Alarm alarm = Alarm.builder()
-                    .senderId(user.getId())
-                    .senderImg(user.getPicture())
-                    .senderName(username)
-                    .user(userByPostId)
-                    .message(message)
-                    .build();
-
-            alarmRepository.save(alarm);
         }
+        Alarm alarm = Alarm.builder()
+                .senderId(user.getId())
+                .senderImg(user.getPicture())
+                .senderName(username)
+                .user(userByPostId)
+                .message(message)
+                .build();
+
+        alarmRepository.save(alarm);
+
         postService.likePost(customUserDetails.getId(), postId);
         return ApiResponse.ok();
     }
