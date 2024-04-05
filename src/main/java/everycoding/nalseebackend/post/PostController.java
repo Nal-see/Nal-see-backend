@@ -4,6 +4,8 @@ import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.firebase.FcmService;
+import everycoding.nalseebackend.firebase.alarm.AlarmRepository;
+import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
 import everycoding.nalseebackend.firebase.dto.FcmSendDto;
 import everycoding.nalseebackend.post.dto.*;
 import everycoding.nalseebackend.user.UserRepository;
@@ -33,6 +35,7 @@ public class PostController {
     private final FcmService fcmService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final AlarmRepository alarmRepository;
 
     // 기본 조회
     @GetMapping("/api/posts")
@@ -127,15 +130,28 @@ public class PostController {
         String username = user.getUsername();
 
         String userToken = userService.findUserTokenByPostId(postId);
-        if(!userToken.equals("error")) {
+        User userByPostId = userService.findUserByPostId(postId);
+        if(userToken != null && !userToken.equals("error")) {
+            String message = username +"님이 좋아요를 눌렀습니다.";
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
                     .title("좋아요 알림")
-                    .body(username +"님이 좋아요를 눌렀습니다.")
+                    .body(message)
+                    .postId(postId)
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
+
+            Alarm alarm = Alarm.builder()
+                    .senderId(user.getId())
+                    .senderImg(user.getPicture())
+                    .senderName(username)
+                    .user(userByPostId)
+                    .message(message)
+                    .build();
+
+            alarmRepository.save(alarm);
         }
         postService.likePost(customUserDetails.getId(), postId);
         return ApiResponse.ok();

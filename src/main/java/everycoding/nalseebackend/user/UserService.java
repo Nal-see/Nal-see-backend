@@ -1,6 +1,8 @@
 package everycoding.nalseebackend.user;
 
 import everycoding.nalseebackend.api.exception.BaseException;
+import everycoding.nalseebackend.comment.CommentRepository;
+import everycoding.nalseebackend.comment.domain.Comment;
 import everycoding.nalseebackend.post.PostRepository;
 import everycoding.nalseebackend.post.domain.Post;
 import everycoding.nalseebackend.user.domain.UserInfo;
@@ -30,6 +32,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CommentRepository commentRepository;
 
     public void followUser(Long userId, Long myId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
@@ -121,5 +124,29 @@ public class UserService {
             return "error";
         }
         return fcmToken;
+    }
+
+    public User findUserByPostId(Long postId) {
+        Optional<Post> byId = postRepository.findById(postId);
+        Post post = byId.orElseThrow();
+
+        return post.getUser();
+    }
+
+    public String findUserTokenByCommentId(Long commentId) {
+        Optional<Comment> byId = commentRepository.findById(commentId);
+        Comment comment = byId.orElseThrow();
+        User user = comment.getUser();
+        String fcmToken = user.getFcmToken();
+        if (fcmToken.isEmpty()) {
+            return "error";
+        }
+        return fcmToken;
+    }
+
+    public User findUserByCommentId(Long commentId) {
+        Optional<Comment> byId = commentRepository.findById(commentId);
+        Comment comment = byId.orElseThrow();
+        return comment.getUser();
     }
 }

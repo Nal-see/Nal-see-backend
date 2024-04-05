@@ -4,6 +4,8 @@ import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.firebase.FcmService;
+import everycoding.nalseebackend.firebase.alarm.AlarmRepository;
+import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
 import everycoding.nalseebackend.firebase.dto.FcmSendDto;
 import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
@@ -27,6 +29,7 @@ public class UserController {
     private final FcmService fcmService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    private final AlarmRepository alarmRepository;
 
     // 팔로우
     @PostMapping("/api/users/{userId}/follow")
@@ -51,15 +54,27 @@ public class UserController {
         Optional<User> byId = userRepository.findById(userId);
         User owner = byId.orElseThrow();
         String userToken = owner.getFcmToken();
-        if(!userToken.equals("error")) {
+        if(userToken != null && !userToken.equals("error")) {
+            String message = username +"님이 팔로우를 시작했습니다.";
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
                     .token(userToken)
                     .title("팔로우 알림")
-                    .body(username +"님이 팔로우를 시작했습니다.")
+                    .body(message)
+                    .userId(user.getId())
                     .build();
 
             fcmService.sendMessageTo(fcmSendDto);
+
+            Alarm alarm = Alarm.builder()
+                    .senderId(user.getId())
+                    .senderImg(user.getPicture())
+                    .senderName(username)
+                    .user(owner)
+                    .message(message)
+                    .build();
+
+            alarmRepository.save(alarm);
         }
         userService.followUser(userId, customUserDetails.getId());
         return ApiResponse.ok();
