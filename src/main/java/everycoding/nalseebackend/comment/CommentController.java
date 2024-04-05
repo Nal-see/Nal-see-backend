@@ -63,7 +63,7 @@ public class CommentController {
          String userToken = userService.findUserTokenByPostId(postId);
          User userByPostId = userService.findUserByPostId(postId);
          String message = username + "님께서 댓글을 작성했습니다.";
-         if(userToken != null && !userToken.equals("error")) {
+         if(!userToken.equals("error")) {
              //  FCM 메시지 생성 및 전송
              FcmSendDto fcmSendDto = FcmSendDto.builder()
                      .token(userToken)
@@ -137,7 +137,7 @@ public class CommentController {
         String userToken = userService.findUserTokenByCommentId(commentId);
         User userByCommentId = userService.findUserByCommentId(commentId);
         String message = username + "님이 댓글에 좋아요를 눌렀습니다.";
-        if(userToken != null && !userToken.equals("error")) {
+        if(!userToken.equals("error")) {
 
             //  FCM 메시지 생성 및 전송
             FcmSendDto fcmSendDto = FcmSendDto.builder()
