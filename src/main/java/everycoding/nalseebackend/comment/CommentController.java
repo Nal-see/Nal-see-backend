@@ -52,23 +52,23 @@ public class CommentController {
                 token = cookie.getValue();
             }
         }
-        Claims claims = jwtTokenProvider.getClaims(token);
-        String userEmail = claims.getSubject();
-        Optional<User> byEmail = userRepository.findByEmail(userEmail);
-        User user = byEmail.orElseThrow();
-        String username = user.getUsername();
+        // Claims claims = jwtTokenProvider.getClaims(token);
+        // String userEmail = claims.getSubject();
+        // Optional<User> byEmail = userRepository.findByEmail(userEmail);
+        // User user = byEmail.orElseThrow();
+        // String username = user.getUsername();
 
-        String userToken = userService.findUserTokenByPostId(postId);
-        if(!userToken.equals("error")) {
-            //  FCM 메시지 생성 및 전송
-            FcmSendDto fcmSendDto = FcmSendDto.builder()
-                    .token(userToken)
-                    .title("새로운 댓글 알림")
-                    .body(username + "님께서 댓글을 작성했습니다.")
-                    .build();
+        // String userToken = userService.findUserTokenByPostId(postId);
+        // if(!userToken.equals("error")) {
+        //     //  FCM 메시지 생성 및 전송
+        //     FcmSendDto fcmSendDto = FcmSendDto.builder()
+        //             .token(userToken)
+        //             .title("새로운 댓글 알림")
+        //             .body(username + "님께서 댓글을 작성했습니다.")
+        //             .build();
 
-            fcmService.sendMessageTo(fcmSendDto);
-        }
+        //     fcmService.sendMessageTo(fcmSendDto);
+        // }
 
         commentService.writeComment(postId, requestDto);
         return ApiResponse.ok();
