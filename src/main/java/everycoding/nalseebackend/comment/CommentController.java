@@ -61,7 +61,7 @@ public class CommentController {
          String username = user.getUsername();
 
          String userToken = userService.findUserTokenByPostId(postId);
-        User userByPostId = userService.findUserByPostId(postId);
+         User userByPostId = userService.findUserByPostId(postId);
          if(userToken != null && !userToken.equals("error")) {
              String message = username + "님께서 댓글을 작성했습니다.";
              //  FCM 메시지 생성 및 전송
