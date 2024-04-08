@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class UserInfoRequestDto {
+    private String username;
     private Double height;
     private Double weight;
     private Constitution constitution;

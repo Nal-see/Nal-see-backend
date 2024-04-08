@@ -56,6 +56,7 @@ public class UserService {
     public UserInfoResponseDto getUserInfo(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
         return UserInfoResponseDto.builder()
+                .username(user.getUsername())
                 .height(user.getUserInfo().getHeight())
                 .weight(user.getUserInfo().getWeight())
                 .constitution(user.getUserInfo().getConstitution())
@@ -66,6 +67,11 @@ public class UserService {
 
     public void setUserInfo(long userId, UserInfoRequestDto requestDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
+
+        // 새로운 username이 제공되었는지 확인하고 업데이트
+        if (requestDto.getUsername() != null && !requestDto.getUsername().equals(user.getUsername())) {
+            user.setUsername(requestDto.getUsername());
+        }
         user.setUserInfo(
                 UserInfo.builder()
                 .height(requestDto.getHeight())
