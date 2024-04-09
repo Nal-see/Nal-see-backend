@@ -32,8 +32,8 @@ public class AlarmService {
             if (alarm.getPostId() != null) {
                 builder.postId(alarm.getPostId());
             }
-            if (alarm.getUserId() != null) {
-                builder.userId(alarm.getUserId());
+            if (alarm.getOwnerId() != null) {
+                builder.userId(alarm.getOwnerId());
             }
 
             return builder.build();

@@ -75,7 +75,7 @@ public class UserController {
                     .senderName(username)
                     .user(owner)
                     .message(message)
-                    .userId(user.getId())
+                    .ownerId(user.getId())
                     .build();
 
             alarmRepository.save(alarm);

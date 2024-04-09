@@ -33,13 +33,13 @@ public class Alarm extends BaseEntity {
     private Long postId;
 
     @Nullable
-    private Long userId;
+    private Long ownerId;
 
     @ManyToOne
     private User user;
 
     @Builder
-    public Alarm(Long id, String message, Long senderId, String senderImg, String senderName, @Nullable Long commentId, @Nullable Long postId, @Nullable Long userId, User user) {
+    public Alarm(Long id, String message, Long senderId, String senderImg, String senderName, @Nullable Long commentId, @Nullable Long postId, @Nullable Long ownerId, User user) {
         this.id = id;
         this.message = message;
         this.senderId = senderId;
@@ -47,7 +47,7 @@ public class Alarm extends BaseEntity {
         this.senderName = senderName;
         this.commentId = commentId;
         this.postId = postId;
-        this.userId = userId;
+        this.ownerId = ownerId;
         this.user = user;
     }
 }
