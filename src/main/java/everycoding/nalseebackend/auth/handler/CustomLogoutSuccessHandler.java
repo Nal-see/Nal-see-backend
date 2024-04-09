@@ -43,9 +43,9 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
                 userService.clearRefreshToken(email);
             }
 
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", null)
-                .path("/").sameSite("None").httpOnly(false).secure(true).maxAge(0).build();
-        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
+//        ResponseCookie refreshTokenCookie = ResponseCookie.from("RefreshToken", null)
+//                .path("/").sameSite("None").httpOnly(false).secure(true).maxAge(0).build();
+//        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
 //            Cookie cookie = new Cookie("RefreshToken", null);
 //            cookie.setPath("/");
