@@ -3,6 +3,7 @@ package everycoding.nalseebackend.firebase.alarm;
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
+import everycoding.nalseebackend.firebase.alarm.dto.AlarmDto;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import io.jsonwebtoken.Claims;
@@ -20,12 +21,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AlarmController {
 
-    private final AlarmRepository alarmRepository;
+    private final AlarmService alarmService;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
     @GetMapping("/notification")
-    public ApiResponse<List<Alarm>> getAlarms (HttpServletRequest request) {
+    public ApiResponse<List<AlarmDto>> getAlarms (HttpServletRequest request) {
         String token = "";
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
@@ -38,8 +39,6 @@ public class AlarmController {
         Optional<User> byEmail = userRepository.findByEmail(userEmail);
         User user = byEmail.orElseThrow();
 
-        List<Alarm> alarmsByUser = alarmRepository.findAlarmsByUser(user);
-
-        return ApiResponse.ok(alarmsByUser);
+        return ApiResponse.ok(alarmService.getAllAlarm(user));
     }
 }
