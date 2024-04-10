@@ -14,12 +14,15 @@ public class FcmSendDto {
     private String body;
 
     @Nullable
+    @Setter
     private Long commentId;
 
     @Nullable
+    @Setter
     private Long postId;
 
     @Nullable
+    @Setter
     private Long userId;
 
     @Builder

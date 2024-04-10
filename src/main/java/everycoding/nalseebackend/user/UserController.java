@@ -2,16 +2,12 @@ package everycoding.nalseebackend.user;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
-import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
-import everycoding.nalseebackend.firebase.FcmService;
-import everycoding.nalseebackend.firebase.alarm.AlarmRepository;
-import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
-import everycoding.nalseebackend.firebase.dto.FcmSendDto;
+import everycoding.nalseebackend.firebase.alarm.AlarmService;
+import everycoding.nalseebackend.firebase.alarm.domain.AlarmType;
 import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
 import everycoding.nalseebackend.user.dto.UserInfoRequestDto;
 import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,10 +22,8 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
-    private final FcmService fcmService;
-    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
-    private final AlarmRepository alarmRepository;
+    private final AlarmService alarmService;
 
     // 팔로우
     @PostMapping("/api/users/{userId}/follow")
@@ -45,42 +39,15 @@ public class UserController {
                 token = cookie.getValue();
             }
         }
-        Claims claims = jwtTokenProvider.getClaims(token);
-        String userEmail = claims.getSubject();
-        Optional<User> byEmail = userRepository.findByEmail(userEmail);
-        User user = byEmail.orElseThrow();
+        User user = userService.findUserByJwt(token);
         String username = user.getUsername();
 
         Optional<User> byId = userRepository.findById(userId);
         User owner = byId.orElseThrow();
         String userToken = owner.getFcmToken();
         String message = username +"님이 팔로우를 시작했습니다.";
-        if (!owner.getId().equals(user.getId())) {
-            if (userToken != null && !userToken.isEmpty()) {
-                if (!userToken.equals("error")) {
-                    //  FCM 메시지 생성 및 전송
-                    FcmSendDto fcmSendDto = FcmSendDto.builder()
-                            .token(userToken)
-                            .title("팔로우 알림")
-                            .body(message)
-                            .userId(user.getId())
-                            .build();
-
-                    fcmService.sendMessageTo(fcmSendDto);
-                }
-            }
-            Alarm alarm = Alarm.builder()
-                    .senderId(user.getId())
-                    .senderImg(user.getPicture())
-                    .senderName(username)
-                    .user(owner)
-                    .message(message)
-                    .ownerId(user.getId())
-                    .build();
-
-            alarmRepository.save(alarm);
-        }
-
+        String title = "팔로우 알림";
+        alarmService.sendFcmAndSaveAlarm(owner, user, username, userToken, title, message, user.getId(), AlarmType.USER);
         userService.followUser(userId, customUserDetails.getId());
         return ApiResponse.ok();
     }

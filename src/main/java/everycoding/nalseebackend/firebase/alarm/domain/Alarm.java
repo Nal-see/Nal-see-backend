@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 @Entity
@@ -27,12 +28,15 @@ public class Alarm extends BaseEntity {
     private String senderName;
 
     @Nullable
+    @Setter
     private Long commentId;
 
     @Nullable
+    @Setter
     private Long postId;
 
     @Nullable
+    @Setter
     private Long ownerId;
 
     @ManyToOne

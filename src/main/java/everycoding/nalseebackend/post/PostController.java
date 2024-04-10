@@ -2,17 +2,11 @@ package everycoding.nalseebackend.post;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
-import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
-import everycoding.nalseebackend.firebase.FcmService;
-import everycoding.nalseebackend.firebase.alarm.AlarmRepository;
-import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
-import everycoding.nalseebackend.firebase.dto.FcmSendDto;
+import everycoding.nalseebackend.firebase.alarm.AlarmService;
+import everycoding.nalseebackend.firebase.alarm.domain.AlarmType;
 import everycoding.nalseebackend.post.dto.*;
-import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.UserService;
 import everycoding.nalseebackend.user.domain.User;
-import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -32,10 +25,7 @@ public class PostController {
 
     private final PostService postService;
     private final UserService userService;
-    private final FcmService fcmService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
-    private final AlarmRepository alarmRepository;
+    private final AlarmService alarmService;
 
     // 기본 조회
     @GetMapping("/api/posts")
@@ -123,40 +113,14 @@ public class PostController {
                 log.info("token={}", token);
             }
         }
-        Claims claims = jwtTokenProvider.getClaims(token);
-        String userEmail = claims.getSubject();
-        Optional<User> byEmail = userRepository.findByEmail(userEmail);
-        User user = byEmail.orElseThrow();
+        User user = userService.findUserByJwt(token);
         String username = user.getUsername();
 
         String userToken = userService.findUserTokenByPostId(postId);
         User userByPostId = userService.findUserByPostId(postId);
         String message = username +"님이 좋아요를 눌렀습니다.";
-        if (!userByPostId.getId().equals(user.getId())) {
-            if (!userToken.equals("error")) {
-
-                //  FCM 메시지 생성 및 전송
-                FcmSendDto fcmSendDto = FcmSendDto.builder()
-                        .token(userToken)
-                        .title("좋아요 알림")
-                        .body(message)
-                        .postId(postId)
-                        .build();
-
-                fcmService.sendMessageTo(fcmSendDto);
-            }
-            Alarm alarm = Alarm.builder()
-                    .senderId(user.getId())
-                    .senderImg(user.getPicture())
-                    .senderName(username)
-                    .user(userByPostId)
-                    .message(message)
-                    .postId(postId)
-                    .build();
-
-            alarmRepository.save(alarm);
-        }
-
+        String title = "좋아요 알림";
+        alarmService.sendFcmAndSaveAlarm(userByPostId, user, username, userToken, title, message, postId, AlarmType.POST);
         postService.likePost(customUserDetails.getId(), postId);
         return ApiResponse.ok();
     }

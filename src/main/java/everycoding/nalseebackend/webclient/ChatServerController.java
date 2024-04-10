@@ -4,7 +4,6 @@ import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.firebase.FcmService;
 import everycoding.nalseebackend.firebase.dto.FcmSendDto;
 import everycoding.nalseebackend.user.UserRepository;
-import everycoding.nalseebackend.user.UserService;
 import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.webclient.dto.MessageEventDto;
 import everycoding.nalseebackend.webclient.dto.UserInfo;
@@ -15,13 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class UsersController {
+public class ChatServerController {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
@@ -61,14 +59,18 @@ public class UsersController {
         String fcmToken = receiver.getFcmToken();
         log.info("messageEvent 진입, 메시지: {}", messageEventDto);
         log.info(messageEventDto.getSenderName() + "님께서 메시지를 보냈습니다.");
-        // FCM 메시지 생성 및 전송
-        FcmSendDto fcmSendDto = FcmSendDto.builder()
-                    .token(fcmToken)
-                    .title(messageEventDto.getSenderName() + "님께서 메시지를 보냈습니다.")
-                    .body(messageEventDto.getMessage())
-                    .build();
+        if (fcmToken != null && !fcmToken.isEmpty()) {
+            if (!fcmToken.equals("error")) {
+                // FCM 메시지 생성 및 전송
+                FcmSendDto fcmSendDto = FcmSendDto.builder()
+                        .token(fcmToken)
+                        .title(messageEventDto.getSenderName() + "님께서 메시지를 보냈습니다.")
+                        .body(messageEventDto.getMessage())
+                        .build();
 
-        fcmService.sendMessageTo(fcmSendDto);
+                fcmService.sendMessageTo(fcmSendDto);
+            }
+        }
 
     }
 }

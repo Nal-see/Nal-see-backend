@@ -1,6 +1,7 @@
 package everycoding.nalseebackend.user;
 
 import everycoding.nalseebackend.api.exception.BaseException;
+import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.comment.CommentRepository;
 import everycoding.nalseebackend.comment.domain.Comment;
 import everycoding.nalseebackend.post.PostRepository;
@@ -9,6 +10,7 @@ import everycoding.nalseebackend.user.domain.UserInfo;
 import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
 import everycoding.nalseebackend.user.dto.UserInfoRequestDto;
 import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 import everycoding.nalseebackend.auth.dto.request.SignupRequestDto;
@@ -20,7 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -33,6 +34,7 @@ public class UserService {
     private final PostRepository postRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CommentRepository commentRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public void followUser(Long userId, Long myId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
@@ -155,4 +157,12 @@ public class UserService {
         Comment comment = byId.orElseThrow();
         return comment.getUser();
     }
+
+    public User findUserByJwt(String token) {
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String userEmail = claims.getSubject();
+        Optional<User> byEmail = userRepository.findByEmail(userEmail);
+        return byEmail.orElseThrow();
+    }
+
 }
