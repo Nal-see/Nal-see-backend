@@ -37,7 +37,7 @@ public class User extends BaseEntity {
     private String picture;
 
     private String role;
-
+    @Setter
     private boolean newUser = true;
 
     @Setter

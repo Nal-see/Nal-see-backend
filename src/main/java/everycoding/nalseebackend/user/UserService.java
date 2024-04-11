@@ -83,6 +83,7 @@ public class UserService {
                 .gender(requestDto.getGender())
                 .build()
         );
+        user.setNewUser(false);
         userRepository.save(user);
     }
 
