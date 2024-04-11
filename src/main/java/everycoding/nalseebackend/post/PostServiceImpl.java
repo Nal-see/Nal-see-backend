@@ -160,7 +160,7 @@ public class PostServiceImpl implements PostService{
         return new PostForDetailResponseDto(
                 PostResponseDto.createPostResponseDto(post, isLiked(userId, post.getId())),
                 post.getUserInfo(),
-                commentService.getComments(postId)
+                commentService.getComments(userId, postId)
         );
     }
 

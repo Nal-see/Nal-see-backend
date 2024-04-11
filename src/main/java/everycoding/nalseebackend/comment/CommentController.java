@@ -27,8 +27,10 @@ public class CommentController {
 
     // 댓글 조회
     @GetMapping("/api/posts/{postId}/comments")
-    public ApiResponse<List<CommentResponseDto>> getComments(@PathVariable Long postId) {
-        return ApiResponse.ok(commentService.getComments(postId));
+    public ApiResponse<List<CommentResponseDto>> getComments(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long postId) {
+        return ApiResponse.ok(commentService.getComments(customUserDetails.getId(), postId));
     }
 
     // 댓글 작성
