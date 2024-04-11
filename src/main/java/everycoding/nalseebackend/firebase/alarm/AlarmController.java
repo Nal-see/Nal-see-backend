@@ -2,7 +2,6 @@ package everycoding.nalseebackend.firebase.alarm;
 
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
-import everycoding.nalseebackend.firebase.alarm.domain.Alarm;
 import everycoding.nalseebackend.firebase.alarm.dto.AlarmDto;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
@@ -10,7 +9,6 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

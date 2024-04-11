@@ -27,6 +27,7 @@ public class AlarmService {
                     .message(alarm.getMessage())
                     .senderId(alarm.getSenderId())
                     .senderName(alarm.getSenderName())
+                    .createAt(alarm.getCreateDate())
                     .senderImage(alarm.getSenderImg());
 
             if (alarm.getCommentId() != null) {
