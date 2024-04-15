@@ -1,7 +1,7 @@
 package everycoding.nalseebackend.post.controller.dto;
 
 import everycoding.nalseebackend.comment.controller.dto.CommentResponseDto;
-import everycoding.nalseebackend.user.domain.UserDetail;
+import everycoding.nalseebackend.user.controller.dto.UserDetailDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class PostForDetailResponseDto {
     private PostResponseDto postResponseDto;
-    private UserDetail userDetail;
+    private UserDetailDto userDetailDto;
     private List<CommentResponseDto> comments;
 }

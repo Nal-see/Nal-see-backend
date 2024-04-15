@@ -15,6 +15,7 @@ import everycoding.nalseebackend.post.service.info.PostScoreInfo;
 import everycoding.nalseebackend.user.controller.dto.UserDetailDto;
 import everycoding.nalseebackend.user.domain.UserDetail;
 import everycoding.nalseebackend.user.service.info.UserDetailInfo;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @org.mapstruct.Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -24,8 +25,11 @@ public interface Mapper {
 
     PostResponseDto toDto(PostInfo info);
 
+    @Mapping(target = "postResponseDto", source = "postInfo")
     PostScoreDto toDto(PostScoreInfo info);
 
+    @Mapping(target = "postResponseDto", source = "postInfo")
+    @Mapping(target = "userDetailDto", source = "userDetailInfo")
     PostForDetailResponseDto toDto(PostForDetailInfo info);
 
     PostForUserFeedResponseDto toDto(PostForUserFeedInfo infos);
