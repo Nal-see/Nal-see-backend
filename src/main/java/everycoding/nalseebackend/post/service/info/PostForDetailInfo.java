@@ -13,5 +13,5 @@ import java.util.List;
 public class PostForDetailInfo {
     private PostInfo postInfo;
     private UserDetailInfo userDetailInfo;
-    private List<CommentInfo> commentInfoList;
+    private List<CommentInfo> comments;
 }
