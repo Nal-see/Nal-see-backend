@@ -7,6 +7,7 @@ import everycoding.nalseebackend.auth.customUser.CustomUserDetailsService;
 import everycoding.nalseebackend.auth.dto.request.LoginRequestDto;
 import everycoding.nalseebackend.auth.dto.response.UserDto;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
+import everycoding.nalseebackend.sse.UserStatusController;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import jakarta.servlet.FilterChain;
@@ -25,6 +26,8 @@ import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -33,17 +36,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CustomUserDetailsService customUserDetailsService;
+    private final UserStatusController userStatusController;
 
     public JwtAuthenticationFilter(
             JwtTokenProvider jwtTokenProvider,
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
             CustomUserDetailsService customUserDetailsService,
-            String url) {
+            String url, UserStatusController userStatusController) {
         super(authenticationManager);
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.customUserDetailsService = customUserDetailsService;
+        this.userStatusController = userStatusController;
         setFilterProcessesUrl(url);
     }
 
@@ -121,6 +126,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
         User user = customUserDetailsService.selcetUser(userEmail);
         user.setRefreshToken(refreshToken);
+        userStatusController.updateUserStatus(user.getId(), true);
         userRepository.save(user);
         UserDto userDto = new UserDto();
         userDto.setUserId(user.getId());

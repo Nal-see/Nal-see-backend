@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class ChatServerController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final FcmService fcmService;
+    private final Set<Long> authenticatedUsers;
 
     @GetMapping("/user/info")
     public UserInfo getUser(HttpServletRequest request) {
@@ -71,6 +73,11 @@ public class ChatServerController {
                 fcmService.sendMessageTo(fcmSendDto);
             }
         }
+    }
 
+    @PostMapping("/online")
+    public Boolean isOnline(@RequestBody Long userId) {
+        log.info(authenticatedUsers.toString());
+        return authenticatedUsers.contains(userId);
     }
 }

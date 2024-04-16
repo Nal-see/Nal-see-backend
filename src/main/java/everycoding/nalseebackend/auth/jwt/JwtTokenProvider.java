@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static everycoding.nalseebackend.auth.jwt.JwtProperties.SECRET_KEY;
@@ -19,6 +20,7 @@ import static everycoding.nalseebackend.auth.jwt.JwtProperties.SECRET_KEY;
 public class JwtTokenProvider {
 
     private final UserRepository userRepository;
+//    private final Set<Long> authenticatedUsers;
 
     public String createAccessToken(Authentication authentication){
 
@@ -53,6 +55,10 @@ public class JwtTokenProvider {
     public String validateToken(String accessToken) {
         try {
             Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(accessToken);
+//            User user = userRepository.findByEmail(getClaims(accessToken).getSubject()).orElseThrow();
+//            Long userId = user.getId();
+//            System.out.println(userId);
+//            authenticatedUsers.add(userId);
             return "Success";
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             return "signature is wrong.";
