@@ -12,6 +12,7 @@ import everycoding.nalseebackend.auth.jwt.JwtAccessDeniedHandler;
 import everycoding.nalseebackend.auth.jwt.JwtAuthenticationEntryPoint;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.auth.oauth2.CustomOAuth2UserService;
+import everycoding.nalseebackend.sse.UserStatusController;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import jakarta.servlet.ServletException;
@@ -44,6 +45,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @EnableWebSecurity
 @EnableMethodSecurity
 @Configuration
@@ -55,6 +59,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserStatusController userStatusController;
 
     //Spring Security에서 제공하는 클래스, 비밀번호를 안전하게 해싱
     @Bean
@@ -76,12 +81,12 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/logout")
-                        .logoutSuccessHandler(new CustomLogoutSuccessHandler(jwtTokenProvider, customUserDetailsService))
+                        .logoutSuccessHandler(new CustomLogoutSuccessHandler(jwtTokenProvider, customUserDetailsService, userRepository, userStatusController))
                         .deleteCookies("RefreshToken","AccessToken")
                         .permitAll()
                 )
-                .addFilter(new JwtAuthenticationFilter(jwtTokenProvider, userRepository, authenticationManager(customUserDetailsService), customUserDetailsService, "/api/auth"))
-                .addFilterAfter(new JwtAuthorizationFilter(userRepository, jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(new JwtAuthenticationFilter(jwtTokenProvider, userRepository, authenticationManager(customUserDetailsService), customUserDetailsService, "/api/auth", userStatusController))
+                .addFilterAfter(new JwtAuthorizationFilter(userRepository, jwtTokenProvider, userStatusController), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll());
 //                .exceptionHandling(configurer -> configurer
@@ -143,6 +148,7 @@ public class SecurityConfig {
         }
         User user = customUserDetailsService.selcetUser(userEmail);
         user.setRefreshToken(refreshToken);
+        userStatusController.updateUserStatus(user.getId(), true);
         userRepository.save(user);
         UserDto userDto = new UserDto();
         userDto.setUserId(user.getId());

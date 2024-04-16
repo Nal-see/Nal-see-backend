@@ -4,6 +4,7 @@ package everycoding.nalseebackend.auth.filter;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.auth.jwt.JwtProperties;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
+import everycoding.nalseebackend.sse.UserStatusController;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import io.jsonwebtoken.Claims;
@@ -22,12 +23,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserStatusController userStatusController;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -67,9 +71,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                     tokenProcessed = true;
                 }
+                Claims claims = jwtTokenProvider.getClaims(accessToken);
+                String subject = claims.getSubject();
+                Optional<User> byEmail = userRepository.findByEmail(subject);
+                User user = byEmail.orElseThrow();
+                Long id = user.getId();
+                userStatusController.updateUserStatus(id, true);
+
             } else if ("token expired".equals(tokenValidationResult)) {
                 // 액세스 토큰이 만료된 경우, 로그를 기록하고 401 에러를 반환합니다.
                 log.info("AccessToken expired");
+                Claims claims = jwtTokenProvider.getClaims(accessToken);
+                String subject = claims.getSubject();
+                Optional<User> byEmail = userRepository.findByEmail(subject);
+                User user = byEmail.orElseThrow();
+                Long id = user.getId();
+                userStatusController.updateUserStatus(id, false);
                 deleteCookie(response, "AccessToken");
                 // 기존 액세스 토큰 쿠키를 삭제하기 위해 Max-Age를 0으로 설정한 쿠키를 생성하고 응답에 추가합니다.
                 return; // 요청 처리 중단
