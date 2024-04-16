@@ -51,7 +51,7 @@ public class AuthController {
         log.info("사용자의 이름 = {}", username);
 
         if(!email.equals(deleteRequestDto.getEmail()) || !username.equals(deleteRequestDto.getUsername())){
-        return ResponseEntity.status(403).body("email 또는 이름을 확인해주세요");
+        return ResponseEntity.status(400).body("email 또는 이름을 확인해주세요");
         }
         userService.deleteUser(deleteRequestDto);
         return ResponseEntity.ok().build();
