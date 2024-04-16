@@ -230,13 +230,10 @@ public class PostServiceImpl implements PostService {
 
         CurrentWeatherInfo currentWeatherInfo = weatherApiCaller.getCurrentWeather(latitude, longitude);
 
-        UserDetail userDetail = UserDetail.builder()
-                .height(userDetailInfo.getHeight())
-                .weight(userDetailInfo.getWeight())
-                .constitution(Constitution.valueOf(userDetailInfo.getConstitution()))
-                .style(userDetailInfo.getStyle().stream().map(FashionStyle::valueOf).collect(Collectors.toList()))
-                .gender(Gender.valueOf(userDetailInfo.getGender()))
-                .build();
+        UserDetail userDetail = new UserDetail();
+        if (userDetailInfo.getHeight() != null) {
+            userDetail = mapper.toUserDetail(userDetailInfo);
+        }
 
         postRepository.save(
                 Post.builder()
