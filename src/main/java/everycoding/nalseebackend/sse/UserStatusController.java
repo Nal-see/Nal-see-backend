@@ -15,7 +15,7 @@ public class UserStatusController {
     private final Map<String, SseEmitter> userEmitters = new ConcurrentHashMap<>();
 
     @GetMapping("/subscribe")
-    public SseEmitter subscribe(@RequestBody List<Long> userIds) {
+    public SseEmitter subscribe(@RequestParam List<Long> userIds) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         // 각 유저 ID에 대해 emitter를 등록
         userIds.forEach(userId -> userEmitters.put(String.valueOf(userId), emitter));
