@@ -8,6 +8,7 @@ import everycoding.nalseebackend.auth.dto.request.UserResponse;
 import everycoding.nalseebackend.user.UserRepository;
 import everycoding.nalseebackend.user.UserService;
 import everycoding.nalseebackend.user.domain.User;
+import everycoding.nalseebackend.webclient.DeleteUserNotificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
+    private final DeleteUserNotificationService deleteUserNotificationService;
     @GetMapping("/api/index")
     public UserResponse getUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -54,6 +56,12 @@ public class AuthController {
         return ResponseEntity.status(400).body("email 또는 이름을 확인해주세요");
         }
         userService.deleteUser(deleteRequestDto);
+        deleteUserNotificationService.checkDeleteUser(user.getId()).subscribe(
+                null,
+                error -> log.error("Failed to send user deletion notification", error),
+                () -> log.info("User deletion notification sent successfully")
+
+        );
         return ResponseEntity.ok().build();
     }
 }
