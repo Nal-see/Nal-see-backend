@@ -173,6 +173,18 @@ public class UserService {
         User user = userRepository.findByEmail(deleteRequestDto.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + deleteRequestDto.getEmail()));
 
+        // 팔로잉 목록 해제
+        for (User following : user.getFollowings()) {
+            following.getFollowers().remove(user);
+        }
+        user.getFollowings().clear();
+
+        // 팔로워 목록 해제
+        for (User follower : user.getFollowers()) {
+            follower.getFollowings().remove(user);
+        }
+        user.getFollowers().clear();
+
         // 사용자 삭제
         userRepository.delete(user);
 
@@ -181,8 +193,6 @@ public class UserService {
 
         //댓글 삭제
         commentRepository.deleteByUser(user);
-
-
 
         log.info("회원 탈퇴 완료: " + user.getUsername());
     }
