@@ -139,4 +139,6 @@ public class User extends BaseEntity {
         this.followings.remove(user);
         user.getFollowers().remove(this);
     }
+
+
 }
