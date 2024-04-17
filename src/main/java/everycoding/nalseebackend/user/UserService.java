@@ -1,6 +1,7 @@
 package everycoding.nalseebackend.user;
 
 import everycoding.nalseebackend.api.exception.BaseException;
+import everycoding.nalseebackend.auth.dto.request.DeleteRequestDto;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.comment.repository.CommentRepository;
 import everycoding.nalseebackend.comment.repository.Comment;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import everycoding.nalseebackend.auth.dto.request.SignupRequestDto;
 import everycoding.nalseebackend.auth.exception.EmailAlreadyUsedException;
 import everycoding.nalseebackend.user.domain.User;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -166,9 +168,10 @@ public class UserService {
         return byEmail.orElseThrow();
     }
 
-    public void deleteUser(SignupRequestDto signupRequestDto) {
-        User user = userRepository.findByEmail(signupRequestDto.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + signupRequestDto.getEmail()));
+    @Transactional
+    public void deleteUser(DeleteRequestDto deleteRequestDto) {
+        User user = userRepository.findByEmail(deleteRequestDto.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + deleteRequestDto.getEmail()));
 
         // 사용자 삭제
         userRepository.delete(user);
