@@ -1,4 +1,4 @@
-package everycoding.nalseebackend.user;
+package everycoding.nalseebackend.user.repository;
 
 import everycoding.nalseebackend.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;

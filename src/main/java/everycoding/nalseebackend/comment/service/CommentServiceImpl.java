@@ -1,15 +1,13 @@
 package everycoding.nalseebackend.comment.service;
 
 import everycoding.nalseebackend.api.exception.BaseException;
-import everycoding.nalseebackend.comment.repository.Comment;
+import everycoding.nalseebackend.comment.domain.Comment;
 import everycoding.nalseebackend.comment.controller.dto.CommentRequestDto;
-import everycoding.nalseebackend.comment.controller.dto.CommentResponseDto;
 import everycoding.nalseebackend.comment.repository.CommentRepository;
-import everycoding.nalseebackend.comment.service.CommentService;
 import everycoding.nalseebackend.comment.service.info.CommentInfo;
 import everycoding.nalseebackend.post.repository.PostRepository;
-import everycoding.nalseebackend.post.repository.Post;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.post.domain.Post;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

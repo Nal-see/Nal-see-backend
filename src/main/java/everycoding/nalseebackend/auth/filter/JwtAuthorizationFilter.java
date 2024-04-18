@@ -2,10 +2,9 @@ package everycoding.nalseebackend.auth.filter;
 
 
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
-import everycoding.nalseebackend.auth.jwt.JwtProperties;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.sse.UserStatusController;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -23,8 +22,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 @Slf4j
