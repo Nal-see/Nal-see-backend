@@ -1,13 +1,15 @@
-package everycoding.nalseebackend.user;
+package everycoding.nalseebackend.user.controller;
 
+import everycoding.nalseebackend.Mapper;
 import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.firebase.alarm.AlarmService;
 import everycoding.nalseebackend.firebase.alarm.domain.AlarmType;
+import everycoding.nalseebackend.user.controller.dto.UserDetailDto;
+import everycoding.nalseebackend.user.repository.UserRepository;
+import everycoding.nalseebackend.user.service.UserService;
 import everycoding.nalseebackend.user.domain.User;
-import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
-import everycoding.nalseebackend.user.dto.UserInfoRequestDto;
-import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
+import everycoding.nalseebackend.user.controller.dto.UserFeedResponseDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final AlarmService alarmService;
+    private final Mapper mapper;
 
     // 팔로우
     @PostMapping("/api/users/{userId}/follow")
@@ -67,17 +70,17 @@ public class UserController {
 
     // 유저 개인정보 조회
     @GetMapping("/api/users/userInfo")
-    public ApiResponse<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-        return ApiResponse.ok(userService.getUserInfo(customUserDetails.getId()));
+    public ApiResponse<UserDetailDto> getUserInfo(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        return ApiResponse.ok(mapper.toDto(userService.getUserInfo(customUserDetails.getId())));
     }
 
     // 유저 개인정보 등록
     @PostMapping("/api/users/userInfo")
     public ApiResponse<Void> setUserInfo(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody UserInfoRequestDto requestDto
+            @RequestBody UserDetailDto requestDto
     ) {
-        userService.setUserInfo(customUserDetails.getId(), requestDto);
+        userService.setUserInfo(customUserDetails.getId(), mapper.toInfo(requestDto));
         return ApiResponse.ok();
     }
 
@@ -87,6 +90,6 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long userId
     ) {
-        return ApiResponse.ok(userService.getFeed(customUserDetails.getId(), userId));
+        return ApiResponse.ok(mapper.toDto(userService.getFeed(customUserDetails.getId(), userId)));
     }
 }

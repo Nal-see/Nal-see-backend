@@ -1,18 +1,13 @@
 package everycoding.nalseebackend.auth.api;
 
-import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
-import everycoding.nalseebackend.auth.customUser.CustomUserDetailsService;
 import everycoding.nalseebackend.auth.dto.request.DeleteRequestDto;
 import everycoding.nalseebackend.auth.dto.request.SignupRequestDto;
 import everycoding.nalseebackend.auth.dto.request.UserResponse;
-import everycoding.nalseebackend.user.UserRepository;
-import everycoding.nalseebackend.user.UserService;
+import everycoding.nalseebackend.user.service.UserService;
 import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.webclient.DeleteUserNotificationService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

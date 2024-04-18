@@ -3,7 +3,7 @@ package everycoding.nalseebackend.auth.oauth2;
 import com.amazonaws.util.StringUtils;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.auth.exception.OAuth2AuthenticationProcessingException;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

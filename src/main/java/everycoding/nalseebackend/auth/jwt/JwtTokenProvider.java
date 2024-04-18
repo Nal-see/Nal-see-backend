@@ -1,6 +1,6 @@
 package everycoding.nalseebackend.auth.jwt;
 
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static everycoding.nalseebackend.auth.jwt.JwtProperties.SECRET_KEY;

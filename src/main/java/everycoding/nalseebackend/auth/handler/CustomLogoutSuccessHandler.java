@@ -3,7 +3,7 @@ package everycoding.nalseebackend.auth.handler;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetailsService;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.sse.UserStatusController;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -17,8 +17,6 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor

@@ -1,23 +1,22 @@
-package everycoding.nalseebackend.user;
+package everycoding.nalseebackend.user.service;
 
+import everycoding.nalseebackend.Mapper;
 import everycoding.nalseebackend.api.exception.BaseException;
 import everycoding.nalseebackend.auth.dto.request.DeleteRequestDto;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.comment.repository.CommentRepository;
-import everycoding.nalseebackend.comment.repository.Comment;
+import everycoding.nalseebackend.comment.domain.Comment;
 import everycoding.nalseebackend.post.repository.PostRepository;
-import everycoding.nalseebackend.post.repository.Post;
-import everycoding.nalseebackend.user.domain.UserDetail;
-import everycoding.nalseebackend.user.dto.UserFeedResponseDto;
-import everycoding.nalseebackend.user.dto.UserInfoRequestDto;
-import everycoding.nalseebackend.user.dto.UserInfoResponseDto;
+import everycoding.nalseebackend.post.domain.Post;
+import everycoding.nalseebackend.user.repository.UserRepository;
+import everycoding.nalseebackend.user.service.info.UserDetailInfo;
+import everycoding.nalseebackend.user.service.info.UserFeedInfo;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 
 import everycoding.nalseebackend.auth.dto.request.SignupRequestDto;
 import everycoding.nalseebackend.auth.exception.EmailAlreadyUsedException;
 import everycoding.nalseebackend.user.domain.User;
-import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,6 +36,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final CommentRepository commentRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final Mapper mapper;
 
     public void followUser(Long userId, Long myId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
@@ -57,44 +57,38 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserInfoResponseDto getUserInfo(long userId) {
+    public UserDetailInfo getUserInfo(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
-        return UserInfoResponseDto.builder()
+        return UserDetailInfo.builder()
                 .username(user.getUsername())
                 .height(user.getUserDetail().getHeight())
                 .weight(user.getUserDetail().getWeight())
-                .constitution(user.getUserDetail().getConstitution())
-                .style(user.getUserDetail().getStyle())
-                .gender(user.getUserDetail().getGender())
+                .constitution(String.valueOf(user.getUserDetail().getConstitution()))
+                .style(user.getUserDetail().getStyle().stream().map(String::valueOf).toList())
+                .gender(String.valueOf(user.getUserDetail().getGender()))
                 .build();
     }
 
-    public void setUserInfo(long userId, UserInfoRequestDto requestDto) {
+    public void setUserInfo(long userId, UserDetailInfo userDetailInfo) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
 
         // 새로운 username이 제공되었는지 확인하고 업데이트
-        if (requestDto.getUsername() != null && !requestDto.getUsername().equals(user.getUsername())) {
-            user.setUsername(requestDto.getUsername());
+        if (userDetailInfo.getUsername() != null && !userDetailInfo.getUsername().equals(user.getUsername())) {
+            user.setUsername(userDetailInfo.getUsername());
         }
         user.setUserDetail(
-                UserDetail.builder()
-                .height(requestDto.getHeight())
-                .weight(requestDto.getWeight())
-                .constitution(requestDto.getConstitution())
-                .style(requestDto.getStyle())
-                .gender(requestDto.getGender())
-                .build()
+                mapper.toUserDetail(userDetailInfo)
         );
         user.setNewUser(false);
         userRepository.save(user);
     }
 
     @Transactional(readOnly = true)
-    public UserFeedResponseDto getFeed(long myId, long userId) {
+    public UserFeedInfo getFeed(long myId, long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
         User me = userRepository.findById(myId).orElseThrow(() -> new BaseException("wrong userId"));
 
-        return UserFeedResponseDto.builder()
+        return UserFeedInfo.builder()
                 .feedCount(user.getPosts().size())
                 .followingCount(user.getFollowings().size())
                 .followerCount(user.getFollowers().size())

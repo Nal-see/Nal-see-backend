@@ -3,7 +3,7 @@ package everycoding.nalseebackend.webclient;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.firebase.FcmService;
 import everycoding.nalseebackend.firebase.dto.FcmSendDto;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import everycoding.nalseebackend.webclient.dto.MessageEventDto;
 import everycoding.nalseebackend.webclient.dto.UserInfo;

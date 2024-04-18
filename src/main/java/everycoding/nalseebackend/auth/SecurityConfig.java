@@ -8,15 +8,12 @@ import everycoding.nalseebackend.auth.dto.response.UserDto;
 import everycoding.nalseebackend.auth.filter.JwtAuthenticationFilter;
 import everycoding.nalseebackend.auth.filter.JwtAuthorizationFilter;
 import everycoding.nalseebackend.auth.handler.CustomLogoutSuccessHandler;
-import everycoding.nalseebackend.auth.jwt.JwtAccessDeniedHandler;
-import everycoding.nalseebackend.auth.jwt.JwtAuthenticationEntryPoint;
 import everycoding.nalseebackend.auth.jwt.JwtTokenProvider;
 import everycoding.nalseebackend.auth.oauth2.CustomOAuth2UserService;
 import everycoding.nalseebackend.sse.UserStatusController;
-import everycoding.nalseebackend.user.UserRepository;
+import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.domain.User;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,8 +42,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @EnableWebSecurity
 @EnableMethodSecurity
