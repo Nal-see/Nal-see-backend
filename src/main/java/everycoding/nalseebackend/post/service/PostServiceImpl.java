@@ -264,8 +264,6 @@ public class PostServiceImpl implements PostService {
         if (userDetailInfo != null) {
             post.setUserDetail(mapper.toUserDetail(userDetailInfo));
         }
-
-        postRepository.save(post);
     }
 
     @Override
@@ -287,9 +285,6 @@ public class PostServiceImpl implements PostService {
 
         user.addPostLike(postId);
         post.increaseLikeCNT();
-
-        userRepository.save(user);
-        postRepository.save(post);
     }
 
     @Override
@@ -299,9 +294,6 @@ public class PostServiceImpl implements PostService {
 
         user.cancelPostLike(postId);
         post.decreaseLikeCNT();
-
-        userRepository.save(user);
-        postRepository.save(post);
     }
 
     private boolean isLiked(long userId, long postId) {

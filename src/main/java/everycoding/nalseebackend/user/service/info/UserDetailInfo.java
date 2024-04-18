@@ -1,5 +1,6 @@
 package everycoding.nalseebackend.user.service.info;
 
+import everycoding.nalseebackend.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,4 +18,15 @@ public class UserDetailInfo {
     private String constitution;
     private List<String> style;
     private String gender;
+
+    public static UserDetailInfo createUserDetailInfo(User user) {
+        return UserDetailInfo.builder()
+                .username(user.getUsername())
+                .height(user.getUserDetail().getHeight())
+                .weight(user.getUserDetail().getWeight())
+                .constitution(String.valueOf(user.getUserDetail().getConstitution()))
+                .style(user.getUserDetail().getStyle().stream().map(String::valueOf).toList())
+                .gender(String.valueOf(user.getUserDetail().getGender()))
+                .build();
+    }
 }
