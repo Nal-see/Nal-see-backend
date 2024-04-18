@@ -59,14 +59,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDetailInfo getUserInfo(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
-        return UserDetailInfo.builder()
-                .username(user.getUsername())
-                .height(user.getUserDetail().getHeight())
-                .weight(user.getUserDetail().getWeight())
-                .constitution(String.valueOf(user.getUserDetail().getConstitution()))
-                .style(user.getUserDetail().getStyle().stream().map(String::valueOf).toList())
-                .gender(String.valueOf(user.getUserDetail().getGender()))
-                .build();
+        return UserDetailInfo.createUserDetailInfo(user);
     }
 
     public void setUserInfo(long userId, UserDetailInfo userDetailInfo) {
@@ -88,15 +81,7 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
         User me = userRepository.findById(myId).orElseThrow(() -> new BaseException("wrong userId"));
 
-        return UserFeedInfo.builder()
-                .feedCount(user.getPosts().size())
-                .followingCount(user.getFollowings().size())
-                .followerCount(user.getFollowers().size())
-                .userId(user.getId())
-                .userImage(user.getPicture())
-                .username(user.getUsername())
-                .isFollowed(user.getFollowers().contains(me))
-                .build();
+        return UserFeedInfo.createUserFeedInfo(user, me);
     }
 
     public User findByEmail(String email) {
