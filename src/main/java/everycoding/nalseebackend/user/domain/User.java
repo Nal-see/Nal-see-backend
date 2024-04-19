@@ -140,5 +140,9 @@ public class User extends BaseEntity {
         user.getFollowers().remove(this);
     }
 
+    public boolean isFollowed(User user) {
+        return this.followings.contains(user);
+    }
+
 
 }

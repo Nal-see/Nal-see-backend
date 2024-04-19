@@ -10,8 +10,9 @@ public class FollowUserInfo {
     private Long userId;
     private String username;
     private String picture;
+    private Boolean isFollowed;
 
-    public static FollowUserInfo createFollowUserInfo(User user) {
-        return new FollowUserInfo(user.getId(), user.getUsername(), user.getPicture());
+    public static FollowUserInfo createFollowUserInfo(User user, User me) {
+        return new FollowUserInfo(user.getId(), user.getUsername(), user.getPicture(), me.isFollowed(user));
     }
 }

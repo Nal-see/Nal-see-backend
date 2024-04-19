@@ -9,4 +9,5 @@ public class FollowUserDto {
     private Long userId;
     private String username;
     private String picture;
+    private Boolean isFollowed;
 }
