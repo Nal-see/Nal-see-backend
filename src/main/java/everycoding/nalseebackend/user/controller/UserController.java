@@ -96,9 +96,12 @@ public class UserController {
     }
 
     @GetMapping("/api/users/{userId}/following")
-    public ApiResponse<List<FollowUserDto>> getFollowingList(@PathVariable Long userId) {
+    public ApiResponse<List<FollowUserDto>> getFollowingList(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId
+    ) {
         return ApiResponse.ok(
-                userService.getFollowingList(userId)
+                userService.getFollowingList(customUserDetails.getId(), userId)
                         .stream()
                         .map(mapper::toDto)
                         .toList()
@@ -106,9 +109,12 @@ public class UserController {
     }
 
     @GetMapping("/api/users/{userId}/follower")
-    public ApiResponse<List<FollowUserDto>> getFollowerList(@PathVariable Long userId) {
+    public ApiResponse<List<FollowUserDto>> getFollowerList(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long userId
+    ) {
         return ApiResponse.ok(
-                userService.getFollowerList(userId)
+                userService.getFollowerList(customUserDetails.getId(), userId)
                         .stream()
                         .map(mapper::toDto)
                         .toList()

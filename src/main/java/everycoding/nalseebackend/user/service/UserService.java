@@ -178,22 +178,23 @@ public class UserService {
         log.info("회원 탈퇴 완료: " + user.getUsername());
     }
 
-    public List<FollowUserInfo> getFollowingList(Long userId) {
+    public List<FollowUserInfo> getFollowingList(Long myId,Long userId) {
+        User me = userRepository.findById(myId).orElseThrow(() -> new BaseException("wrong userId"));
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
 
         return user.getFollowings()
                 .stream()
-                .map(FollowUserInfo::createFollowUserInfo)
+                .map(following -> FollowUserInfo.createFollowUserInfo(following, me))
                 .toList();
     }
 
-    public List<FollowUserInfo> getFollowerList(Long userId) {
+    public List<FollowUserInfo> getFollowerList(Long myId, Long userId) {
+        User me = userRepository.findById(myId).orElseThrow(() -> new BaseException("wrong userId"));
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
 
         return user.getFollowers()
                 .stream()
-                .map(FollowUserInfo::createFollowUserInfo)
+                .map(follower -> FollowUserInfo.createFollowUserInfo(follower, me))
                 .toList();
     }
-
 }
