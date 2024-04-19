@@ -109,11 +109,6 @@ public class User extends BaseEntity {
                 .build();
     }
 
-    public void updateOAuth2UserInfo(OAuth2UserInfo oAuth2UserInfo) {
-        this.username = oAuth2UserInfo.getName();
-        this.picture = oAuth2UserInfo.getImageUrl();
-    }
-
     public void addPostLike(Long postId) {
         postLikeList.add(postId);
     }
