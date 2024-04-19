@@ -9,6 +9,7 @@ import everycoding.nalseebackend.comment.domain.Comment;
 import everycoding.nalseebackend.post.repository.PostRepository;
 import everycoding.nalseebackend.post.domain.Post;
 import everycoding.nalseebackend.user.repository.UserRepository;
+import everycoding.nalseebackend.user.service.info.FollowUserInfo;
 import everycoding.nalseebackend.user.service.info.UserDetailInfo;
 import everycoding.nalseebackend.user.service.info.UserFeedInfo;
 import io.jsonwebtoken.Claims;
@@ -23,6 +24,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -174,6 +176,24 @@ public class UserService {
         commentRepository.deleteByUser(user);
 
         log.info("회원 탈퇴 완료: " + user.getUsername());
+    }
+
+    public List<FollowUserInfo> getFollowingList(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
+
+        return user.getFollowings()
+                .stream()
+                .map(FollowUserInfo::createFollowUserInfo)
+                .toList();
+    }
+
+    public List<FollowUserInfo> getFollowerList(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
+
+        return user.getFollowers()
+                .stream()
+                .map(FollowUserInfo::createFollowUserInfo)
+                .toList();
     }
 
 }

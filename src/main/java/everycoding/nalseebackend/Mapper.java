@@ -12,9 +12,11 @@ import everycoding.nalseebackend.post.service.info.PostForDetailInfo;
 import everycoding.nalseebackend.post.service.info.PostForUserFeedInfo;
 import everycoding.nalseebackend.post.service.info.PostInfo;
 import everycoding.nalseebackend.post.service.info.PostScoreInfo;
+import everycoding.nalseebackend.user.controller.dto.FollowUserDto;
 import everycoding.nalseebackend.user.controller.dto.UserDetailDto;
 import everycoding.nalseebackend.user.controller.dto.UserFeedResponseDto;
 import everycoding.nalseebackend.user.domain.UserDetail;
+import everycoding.nalseebackend.user.service.info.FollowUserInfo;
 import everycoding.nalseebackend.user.service.info.UserDetailInfo;
 import everycoding.nalseebackend.user.service.info.UserFeedInfo;
 import org.mapstruct.Mapping;
@@ -44,6 +46,8 @@ public interface Mapper {
     UserDetailDto toDto(UserDetailInfo info);
 
     UserFeedResponseDto toDto(UserFeedInfo info);
+
+    FollowUserDto toDto(FollowUserInfo info);
 
     UserDetailInfo toInfo(UserDetail userDetail);
 

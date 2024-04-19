@@ -5,6 +5,7 @@ import everycoding.nalseebackend.api.ApiResponse;
 import everycoding.nalseebackend.auth.customUser.CustomUserDetails;
 import everycoding.nalseebackend.firebase.alarm.AlarmService;
 import everycoding.nalseebackend.firebase.alarm.domain.AlarmType;
+import everycoding.nalseebackend.user.controller.dto.FollowUserDto;
 import everycoding.nalseebackend.user.controller.dto.UserDetailDto;
 import everycoding.nalseebackend.user.repository.UserRepository;
 import everycoding.nalseebackend.user.service.UserService;
@@ -17,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -91,5 +93,25 @@ public class UserController {
             @PathVariable Long userId
     ) {
         return ApiResponse.ok(mapper.toDto(userService.getFeed(customUserDetails.getId(), userId)));
+    }
+
+    @GetMapping("/api/users/{userId}/following")
+    public ApiResponse<List<FollowUserDto>> getFollowingList(@PathVariable Long userId) {
+        return ApiResponse.ok(
+                userService.getFollowingList(userId)
+                        .stream()
+                        .map(mapper::toDto)
+                        .toList()
+        );
+    }
+
+    @GetMapping("/api/users/{userId}/follower")
+    public ApiResponse<List<FollowUserDto>> getFollowerList(@PathVariable Long userId) {
+        return ApiResponse.ok(
+                userService.getFollowerList(userId)
+                        .stream()
+                        .map(mapper::toDto)
+                        .toList()
+        );
     }
 }
