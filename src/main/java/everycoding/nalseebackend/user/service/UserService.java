@@ -59,7 +59,18 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDetailInfo getUserInfo(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException("wrong userId"));
+<<<<<<< HEAD
         return UserDetailInfo.createUserDetailInfo(user);
+=======
+        return UserDetailInfo.builder()
+                .username(user.getUsername())
+                .height(user.getUserDetail().getHeight())
+                .weight(user.getUserDetail().getWeight())
+                .constitution(String.valueOf(user.getUserDetail().getConstitution()))
+                .style(user.getUserDetail().getStyle().stream().map(String::valueOf).toList())
+                .gender(String.valueOf(user.getUserDetail().getGender()))
+                .build();
+>>>>>>> 2b107fd (refactor: 유저 controller, service 분리)
     }
 
     public void setUserInfo(long userId, UserDetailInfo userDetailInfo) {
